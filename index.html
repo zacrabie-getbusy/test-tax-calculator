@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AU Tax Calculator 2024–25</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>AU Tax Calculator</h1>
+    <p>2024–25 · Australian residents · estimate only</p>
+  </header>
+
+  <div class="card">
+    <label>Annual gross income</label>
+    <div class="input-row">
+      <span class="dollar">$</span>
+      <input type="number" id="income" placeholder="75000" min="0" max="9999999" step="1000" autofocus />
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Tax withheld by employer (PAYG) — optional</label>
+    <div class="input-row">
+      <span class="dollar">$</span>
+      <input type="number" id="withheld" placeholder="0" min="0" max="9999999" step="100" />
+    </div>
+  </div>
+
+  <div id="results">
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Income tax</div>
+        <div class="metric-value" id="tax-out">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Medicare levy</div>
+        <div class="metric-value" id="medicare-out">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Total tax</div>
+        <div class="metric-value" id="total-out">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Effective rate</div>
+        <div class="metric-value" id="rate-out">—</div>
+      </div>
+    </div>
+
+    <div class="refund-card" id="refund-card">
+      <div class="refund-label" id="refund-label">Take-home pay</div>
+      <div class="refund-value" id="refund-value">—</div>
+      <div class="refund-note" id="refund-note">Add PAYG withheld above to see refund or bill estimate.</div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-title">Bracket breakdown</div>
+      <div id="bracket-breakdown"></div>
+    </div>
+
+    <footer>
+      Includes LITO offset. Excludes deductions, HECS/HELP, super, private health loading, and other offsets.<br>
+      Use the ATO's myTax or a registered tax agent for your actual return.
+    </footer>
+
+  </div>
+</div>
+
+<script src="calculator.js"></script>
+</body>
+</html>
