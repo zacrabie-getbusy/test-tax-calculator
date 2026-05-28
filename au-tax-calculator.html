@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AU Tax Calculator 2024–25</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #F4F1EC;
+    --surface: #FDFCFA;
+    --border: #E0DDD6;
+    --text: #1A1916;
+    --muted: #7A7870;
+    --accent: #2D6A4F;
+    --accent-light: #D8EFE3;
+    --danger: #9B2226;
+    --danger-light: #FBEAEA;
+    --mono: 'DM Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 3rem 1rem 5rem;
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 560px;
+  }
+
+  header {
+    margin-bottom: 2.5rem;
+  }
+
+  header h1 {
+    font-family: var(--mono);
+    font-size: 1.1rem;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  header p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    font-family: var(--mono);
+    font-weight: 300;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+  }
+
+  label {
+    display: block;
+    font-size: 0.72rem;
+    font-family: var(--mono);
+    font-weight: 400;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dollar {
+    font-family: var(--mono);
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: var(--muted);
+    line-height: 1;
+  }
+
+  input[type=number] {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-family: var(--mono);
+    font-size: 1.5rem;
+    font-weight: 400;
+    color: var(--text);
+    -moz-appearance: textfield;
+  }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+  input[type=number]::placeholder { color: #C8C5BE; }
+
+  #results { display: none; margin-top: 1.5rem; }
+
+  .metrics {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .metric {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.1rem;
+  }
+
+  .metric-label {
+    font-size: 0.7rem;
+    font-family: var(--mono);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+
+  .metric-value {
+    font-family: var(--mono);
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .refund-card {
+    border-radius: 4px;
+    padding: 1.25rem;
+    margin-bottom: 0.75rem;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: background 0.2s, border-color 0.2s;
+  }
+
+  .refund-card.positive {
+    background: var(--accent-light);
+    border-color: #A8D5C0;
+  }
+
+  .refund-card.negative {
+    background: var(--danger-light);
+    border-color: #EFC4C4;
+  }
+
+  .refund-label {
+    font-size: 0.7rem;
+    font-family: var(--mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 4px;
+    color: var(--muted);
+  }
+
+  .refund-card.positive .refund-label { color: var(--accent); }
+  .refund-card.negative .refund-label { color: var(--danger); }
+
+  .refund-value {
+    font-family: var(--mono);
+    font-size: 2rem;
+    font-weight: 400;
+    color: var(--text);
+  }
+
+  .refund-card.positive .refund-value { color: var(--accent); }
+  .refund-card.negative .refund-value { color: var(--danger); }
+
+  .refund-note {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  .breakdown {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .breakdown-title {
+    font-size: 0.7rem;
+    font-family: var(--mono);
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.75rem;
+  }
+
+  .bracket-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+
+  .bracket-row:last-child { border-bottom: none; }
+
+  .bracket-range { color: var(--muted); font-family: var(--mono); font-size: 0.78rem; }
+  .bracket-tax { font-family: var(--mono); font-weight: 500; }
+
+  .bar-wrap {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    margin-top: 3px;
+    width: 100%;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+
+  footer {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-top: 1rem;
+    font-family: var(--mono);
+    font-weight: 300;
+  }
+
+  @media (max-width: 480px) {
+    .metrics { grid-template-columns: 1fr 1fr; }
+    .metric-value { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>AU Tax Calculator</h1>
+    <p>2024–25 · Australian residents · estimate only</p>
+  </header>
+
+  <div class="card">
+    <label>Annual gross income</label>
+    <div class="input-row">
+      <span class="dollar">$</span>
+      <input type="number" id="income" placeholder="75000" min="0" max="9999999" step="1000" autofocus />
+    </div>
+  </div>
+
+  <div class="card">
+    <label>Tax withheld by employer (PAYG) — optional</label>
+    <div class="input-row">
+      <span class="dollar">$</span>
+      <input type="number" id="withheld" placeholder="0" min="0" max="9999999" step="100" />
+    </div>
+  </div>
+
+  <div id="results">
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="metric-label">Income tax</div>
+        <div class="metric-value" id="tax-out">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Medicare levy</div>
+        <div class="metric-value" id="medicare-out">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Total tax</div>
+        <div class="metric-value" id="total-out">—</div>
+      </div>
+      <div class="metric">
+        <div class="metric-label">Effective rate</div>
+        <div class="metric-value" id="rate-out">—</div>
+      </div>
+    </div>
+
+    <div class="refund-card" id="refund-card">
+      <div class="refund-label" id="refund-label">Take-home pay</div>
+      <div class="refund-value" id="refund-value">—</div>
+      <div class="refund-note" id="refund-note">Add PAYG withheld above to see refund or bill estimate.</div>
+    </div>
+
+    <div class="breakdown">
+      <div class="breakdown-title">Bracket breakdown</div>
+      <div id="bracket-breakdown"></div>
+    </div>
+
+    <footer>
+      Includes LITO offset. Excludes deductions, HECS/HELP, super, private health loading, and other offsets.<br>
+      Use the ATO's myTax or a registered tax agent for your actual return.
+    </footer>
+
+  </div>
+</div>
+
+<script>
+  function fmt(n) {
+    return '$' + Math.round(n).toLocaleString('en-AU');
+  }
+
+  function calcIncomeTax(income) {
+    if (income <= 18200) return 0;
+    if (income <= 45000) return (income - 18200) * 0.19;
+    if (income <= 120000) return 5092 + (income - 45000) * 0.325;
+    if (income <= 180000) return 29467 + (income - 120000) * 0.37;
+    return 51667 + (income - 180000) * 0.45;
+  }
+
+  function getLITO(income) {
+    if (income <= 37500) return 700;
+    if (income <= 45000) return 700 - (income - 37500) * 0.05;
+    if (income <= 66667) return 325 - (income - 45000) * 0.015;
+    return 0;
+  }
+
+  function getMedicare(income) {
+    if (income < 26000) return 0;
+    if (income < 32500) return (income - 26000) * 0.1;
+    return income * 0.02;
+  }
+
+  function update() {
+    const income = parseFloat(document.getElementById('income').value);
+    const withheld = parseFloat(document.getElementById('withheld').value) || 0;
+
+    if (!income || income < 0) {
+      document.getElementById('results').style.display = 'none';
+      return;
+    }
+
+    const rawTax = calcIncomeTax(income);
+    const lito = getLITO(income);
+    const incomeTax = Math.max(0, rawTax - lito);
+    const medicare = getMedicare(income);
+    const total = incomeTax + medicare;
+    const rate = ((total / income) * 100).toFixed(1);
+    const takeHome = income - total;
+
+    document.getElementById('tax-out').textContent = fmt(incomeTax);
+    document.getElementById('medicare-out').textContent = fmt(medicare);
+    document.getElementById('total-out').textContent = fmt(total);
+    document.getElementById('rate-out').textContent = rate + '%';
+
+    const card = document.getElementById('refund-card');
+    const lbl = document.getElementById('refund-label');
+    const val = document.getElementById('refund-value');
+    const note = document.getElementById('refund-note');
+
+    card.className = 'refund-card';
+
+    if (withheld > 0) {
+      const diff = withheld - total;
+      if (diff >= 0) {
+        card.classList.add('positive');
+        lbl.textContent = 'Estimated refund';
+        val.textContent = fmt(diff);
+        note.textContent = 'You overpaid PAYG — you should get this back at tax time.';
+      } else {
+        card.classList.add('negative');
+        lbl.textContent = 'Estimated tax owing';
+        val.textContent = fmt(Math.abs(diff));
+        note.textContent = 'You underpaid PAYG — you may owe this at tax time.';
+      }
+    } else {
+      lbl.textContent = 'Take-home pay';
+      val.textContent = fmt(takeHome);
+      note.textContent = 'Add PAYG withheld above to see your refund or bill estimate.';
+    }
+
+    const brackets = [
+      { label: '$0 – $18,200', rate: '0%', min: 0, max: 18200, r: 0 },
+      { label: '$18,201 – $45,000', rate: '19%', min: 18201, max: 45000, r: 0.19 },
+      { label: '$45,001 – $120,000', rate: '32.5%', min: 45001, max: 120000, r: 0.325 },
+      { label: '$120,001 – $180,000', rate: '37%', min: 120001, max: 180000, r: 0.37 },
+      { label: '$180,001+', rate: '45%', min: 180001, max: Infinity, r: 0.45 },
+    ];
+
+    const active = brackets.filter(b => income >= b.min);
+    const maxTaxInBracket = Math.max(...active.map(b => {
+      const top = b.max === Infinity ? income : Math.min(income, b.max);
+      return Math.max(0, (top - b.min + 1) * b.r);
+    }));
+
+    const html = active.map(b => {
+      const top = b.max === Infinity ? income : Math.min(income, b.max);
+      const taxable = top - b.min + (b.min > 0 ? 1 : 0);
+      const taxHere = Math.max(0, taxable * b.r);
+      const pct = maxTaxInBracket > 0 ? (taxHere / maxTaxInBracket * 100).toFixed(1) : 0;
+      return `<div class="bracket-row">
+        <div>
+          <span class="bracket-range">${b.label} · ${b.rate}</span>
+          <div class="bar-wrap"><div class="bar-fill" style="width:${pct}%"></div></div>
+        </div>
+        <span class="bracket-tax">${fmt(taxHere)}</span>
+      </div>`;
+    }).join('');
+
+    document.getElementById('bracket-breakdown').innerHTML = html;
+    document.getElementById('results').style.display = 'block';
+  }
+
+  document.getElementById('income').addEventListener('input', update);
+  document.getElementById('withheld').addEventListener('input', update);
+</script>
+</body>
+</html>
